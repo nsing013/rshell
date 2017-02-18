@@ -1,44 +1,47 @@
-#include <iostream>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include "command.h"
 
 using namespace std;
 
-// Executable
-//Fork/Execv/Wait
+command::command(vector<string> cmd){
+    input = cmd;
+    failedExecute = true;
+    arguments = new char*[input.size() + 1];
+}
 
-
-// What we want to do is type in commands and put them in this array so that 
-// our fork process will read our command from the array and run it in the terminal
-    
-    //Fork/execv/wait process
-    char p1[] = "/bin/ls"; //temporarily set the elements in the array
-    char p2[] = "-l";      
-    
-    char* argv[10]; //array of commands IMPORTANT this is where we put in our commands
-    argv[0] = p1;          //temporarily set the elements in the array
-    argv[1] = p2;          
-    argv[2] = NULL;
-
-    pid_t pid = fork(); //forking
-    int status; //sets the status of the child process
-
-    if (pid == 0) // child process
-    {
-        cout << "child" << endl;
-        execv(argv[0], argv);
+void command::parse(){
+    if(input.size() == 0){
+        cout << "vector<string> is empty" << endl;
     }
-    else if (pid > 0) // parent process
-    {
-        cout << "parent" << endl;
-        pid_t tpid = wait(&status);
+    else if(input.at(0) == "exit"){ //checks to see if user typed exit
+        exit(-1); //exits
     }
-    else // fork failed
-    {
+    else{ //otherwise, send commands to arguments char array
+        for(unsigned i = 0; i < input.size(); i++){
+            arguments[i] = (char*)input.at(i).c_str();
+        }
+        arguments[input.size()] = NULL;
+    }
+}
+void command::execCmd(){
+    this->parse();
+    pid_t pid = fork();
+    if (pid == 0){ //CHILD
+        if (execvp(arguments[0], arguments) == -1){
+            perror ("exec");
+        }
+    }
+    if (pid > 0){ //PARENT
+        if ( wait(0) == -1){
+            perror ("wait");
+        }
+    }
+    if (pid < 0){
         cout << "fork() failed!\n";
-        return 1;
+        failedExecute = false;
     }
-    return 0;
+}
 
+bool command::didCommand(){
+    return this->failedExecute;
+}
 
