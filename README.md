@@ -46,5 +46,5 @@ Known Bugs:
 ===========
 
 - When you type the commands without spaces, it wont parse and will give you and error "No such file or directory". Must have spaces.
-- unknown commands (ie. xx) do not return any values. If there is an unknown command, the program should move on to the next command if there is one, however the code is not handling it.
+- Unknown commands (ie. xx) do not return any values. If there is an unknown command, the program should move on to the next command if there is one, however the code is not handling it.
 
