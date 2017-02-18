@@ -57,12 +57,12 @@ void shell::run(){
                 (*it)->execute();
             }
             else if((*it)->getType() == "or"){
-                if((*it)->getBool() == true){
+                if((*it)->getBool() == false){
                     (*it)->execute();
                 }
             }
             else if((*it)->getType() == "and"){
-                if((*it)->getBool() == false){
+                if((*it)->getBool() == true){
                     (*it)->execute();
                 }
             }
