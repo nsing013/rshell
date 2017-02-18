@@ -1,3 +1,5 @@
+#ifndef SHELL_H
+#define SHELL_H
 #include <iostream>
 using namespace std;
 
@@ -15,3 +17,5 @@ class shell{
     char userName[128];
     char hostName[128];
 };
+
+#endif
