@@ -42,4 +42,10 @@ Examples:
     Xf@ericchang123-cs100assignments-4415658$ ls && ps
     Xf@ericchang123-cs100assignments-4415658$ ls || ps
 
+Known Bugs: 
+===========
+
+- When you type the commands without spaces, it wont parse and will give you and error "No such file or directory". Must have spaces.
+- unknown commands (ie. xx) do not return any values. If there is an unknown command, the program should move on to the next command if there is one, howeverr the code is not handling it.
+- comments are not handled 
 
