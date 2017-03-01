@@ -28,6 +28,7 @@ void command::execCmd(){
     if (pid == 0){ //CHILD
         if (execvp(arguments[0], arguments) == -1){
             perror ("exec");
+            exit(1);
         }
     }
     if (pid > 0){ //PARENT
