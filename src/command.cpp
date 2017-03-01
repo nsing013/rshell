@@ -10,7 +10,7 @@ command::command(vector<string> cmd){
 
 void command::parse(){
     if(input.size() == 0){
-        //cout << "vector<string> is empty" << endl;
+        cout << "vector<string> is empty" << endl;
     }
     else if(input.at(0) == "exit"){ //checks to see if user typed exit
         exit(-1); //exits
