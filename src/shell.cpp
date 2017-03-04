@@ -50,9 +50,8 @@ void shell::run(){
             continue;
         }
         //stringstream parser(getInput);                  //turn into ss
-        list<connector*> cList;                         //declare list of connector pointers.
         //string word;
-        
+        list<connector*> cList;                         //declare list of connector pointers.
         connector* curr = new head();
         vector<string> cmd;
         
@@ -66,17 +65,19 @@ void shell::run(){
         //     token = strtok(NULL, ";&|");
         // }    
         
-        char* input = strdup(getInput.c_str()); //this is so theres no problem assigning a const char* to a char*
-        char* token = strtok(input, "()"); // check the command for these connectors using strtok
+        //PARENTHESIS START HERE 
+        char* input = strdup(getInput.c_str());     //this is so theres no problem assigning a const char* to a char*
+        char* token = strtok(input, "()");          // check the command for these connectors using strtok
         
         while(token != NULL)
         {
+            //cout << "Token: " << token << endl; //debug
             string str(token);
             stringstream parser(str);                     //turn into ss
             string word;
             
         while(parser >> word){
-            if(word.at(word.size() - 1) == ';'){                 //check if semi colon
+            if(word.at(word.size() - 1) == ';'){    //check if semi colon
                 if(word.size() > 1){
                     cmd.push_back(word.substr(0, word.size() - 1));
                 }
@@ -87,8 +88,8 @@ void shell::run(){
                 curr = new opSemi();                //makes a new semi connector
             }
             else if(word == "||"){
-                command* c = new command(cmd); //check if OR
-                curr->setCommand(c);
+                command* c = new command(cmd); //check if OR 
+                curr->setCommand(c); 
                 cList.push_back(curr);
                 cmd.clear();
                 curr = new opOr(); //makes a new OR connector
@@ -157,6 +158,11 @@ void shell::run(){
             else if((*it)->getType() == "semi"){
                 (*it)->execute();
             }
+            //cout << "Type: " << (*it)->getType() << endl;
+            //cout << "Bool: " << (*it)->getBool() << endl;
+            
+            //string Type = (*it)->getType();
+            //bool Bool = (*it)->getBool();
         }
         cList.clear();
         token = strtok(NULL, "()");
