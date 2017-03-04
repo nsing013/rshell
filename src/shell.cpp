@@ -13,22 +13,14 @@
 using namespace std;
 
 void testCommand(string test, string path){
-    //cout << "test " << test << " path " << path << endl; //testing
-    
     struct stat s;                                       //declare Stat S
     stat(path.c_str(), &s);                              //make stat
     if(test == "-f" || test == "-d"){
-        // bool dir = S_ISDIR(s.st_mode);                   //tests directory
-        // cout << "result of S_ISDIR is: " << dir << endl;
-        // bool fi = S_ISREG(s.st_mode);
-        // cout << "result of S_ISREG is: " << fi << endl;  //tests file
         if(S_ISDIR(s.st_mode) && test == "-d"){
             cout << "(True)" << endl; 
-            cout << "It is a directory" << endl;
         }
         else if(S_ISREG(s.st_mode) && test == "-f"){
             cout << "(True)" << endl;
-            cout << "It is a file" << endl;
         }
         else{
             cout << "(False)" << endl;
@@ -57,9 +49,9 @@ void shell::run(){
         if(getInput == ""){                             //*****THIS CHECKS TO SEE IF USER ENTERED NOTHING*****
             continue;
         }
-        stringstream parser(getInput);                  //turn into ss
+        //stringstream parser(getInput);                  //turn into ss
         list<connector*> cList;                         //declare list of connector pointers.
-        string word;
+        //string word;
         
         connector* curr = new head();
         vector<string> cmd;
@@ -74,7 +66,15 @@ void shell::run(){
         //     token = strtok(NULL, ";&|");
         // }    
         
+        char* input = strdup(getInput.c_str()); //this is so theres no problem assigning a const char* to a char*
+        char* token = strtok(input, "()"); // check the command for these connectors using strtok
         
+        while(token != NULL)
+        {
+            string str(token);
+            stringstream parser(str);                     //turn into ss
+            string word;
+            
         while(parser >> word){
             if(word.at(word.size() - 1) == ';'){                 //check if semi colon
                 if(word.size() > 1){
@@ -159,5 +159,7 @@ void shell::run(){
             }
         }
         cList.clear();
+        token = strtok(NULL, "()");
+        }
     }
 }
