@@ -1,13 +1,45 @@
 #include <unistd.h>
 #include <string>
+#include <cstring>
 #include <list>
 #include <sstream>
 #include <vector>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "shell.h"
 #include "connector.h"
 #include "command.h"
 
 using namespace std;
+
+void testCommand(string test, string path){
+    cout << "test " << test << " path " << path << endl;
+    char * path_c = new char [path.length() + 1];
+    struct stat s;
+    if(stat(path_c, &s) == 0){
+        if(test == "-f" || test == "-d"){
+            if(s.st_mode & S_IFDIR && test == "-d"){
+                cout << "(True)" << endl; 
+                cout << "It is a directory" << endl;
+            }
+            else if(s.st_mode & S_IFREG && test == "-f"){
+                cout << "(True)" << endl;
+                cout << "It is a file" << endl;
+            }
+            else{
+                cout << "(False)" << endl;
+            }
+        }
+        else if(test == "-e"){
+            if((s.st_mode & S_IFDIR) || (s.st_mode & S_IFREG)){
+                cout << "(True)" << endl;
+            }
+            else{
+                cout << "(False)" << endl;
+            }
+        }
+    }
+}
 
 shell::shell(){
     getlogin_r(userName, 128);
@@ -19,6 +51,9 @@ void shell::run(){
         cout << userName << "@" << hostName << "$ "; 
         string getInput;                                //declare a new string getInput
         getline(cin, getInput);                         //getline the string
+        if(getInput == ""){                             //*****THIS CHECKS TO SEE IF USER ENTERED NOTHING*****
+            continue;
+        }
         stringstream parser(getInput);                  //turn into ss
         list<connector*> cList;                         //declare list of connector pointers.
         string word;
@@ -26,13 +61,27 @@ void shell::run(){
         connector* curr = new head();
         vector<string> cmd;
         
+        
+        // //we need to use strTok for future programs
+        // char* input = strdup(getInput.c_str()); //this is so theres no problem assigning a const char* to a char*
+        // char* token = strtok(input, ";&|"); // check the command for these connectors using strtok
+        // while(token != NULL)
+        // {
+        //     cout << token << endl;
+        //     token = strtok(NULL, ";&|");
+        // }    
+        
+        
         while(parser >> word){
-            if(word == ";"){ //check if semi colon
-                command* c = new command(cmd); //makes new command pointer with cmd vector
-                curr->setCommand(c); //sets curr command as c
-                cList.push_back(curr); //push back curr to list
-                cmd.clear(); //clear the cmd vector
-                curr = new opSemi(); //makes a new semi connector
+            if(word.at(word.size() - 1) == ';'){                 //check if semi colon
+                if(word.size() > 1){
+                    cmd.push_back(word.substr(0, word.size() - 1));
+                }
+                command* c = new command(cmd);      //makes new command pointer with cmd vector
+                curr->setCommand(c);                //sets curr command as c
+                cList.push_back(curr);              //push back curr to list
+                cmd.clear();                        //clear the cmd vector
+                curr = new opSemi();                //makes a new semi connector
             }
             else if(word == "||"){
                 command* c = new command(cmd); //check if OR
@@ -51,6 +100,22 @@ void shell::run(){
             else if(word.at(0) == '#'){ //CHEKCS TO SEE IF USER ENTERED COMMENT
                 break;
             }
+            else if(word == "test" || word == "["){
+                //cout << "test for word" << word << endl; //TESTING
+                parser >> word;
+                //cout << "New test for word" << word << endl; // testing for second parsed word
+                if(word == "-e" || word == "-f" || word == "-d"){ //checks if the file/directory exists
+                    string path;
+                    parser >> path;
+                    //cout << "New test for path" << path << endl; //test for path
+                    testCommand(word, path);
+                }
+                else{
+                    string e = "-e";
+                    //cout << "unchanged word" << word << endl;
+                    testCommand(e, word);
+                }
+            }
             else{
                 //cout << "checking for error and output word: " << word << endl;
                 cmd.push_back(word);
@@ -60,27 +125,30 @@ void shell::run(){
             }
         }
         
-        command* c = new command(cmd); // makes a new command pointer
-        cmd.clear(); //clears vector
-        curr->setCommand(c); //sets current connector command to c
-        cList.push_back(curr); //push back connector to linked list
+        if(!cmd.empty()){
+            command* c = new command(cmd);          // makes a new command pointer
+            cmd.clear();                            //clears vector
+            
+            curr->setCommand(c);                    //sets current connector command to c
+            cList.push_back(curr);                  //push back connector to linked list
+        }
         
         list<connector*>::iterator it; //iterator for navigating list
         for(it = cList.begin(); it != cList.end(); it++){ //forloop through list
-            if((*it)->getType() == "head"){ //checks to see if the type is head connector
-                (*it)->execute(); //if so execute
+            if((*it)->getType() == "head"){
+                (*it)->execute();
             }
-            else if((*it)->getType() == "or"){ //checks to see if type is OR connector
+            else if((*it)->getType() == "or"){
                 if((*it)->getBool() == false){
                     (*it)->execute();
                 }
             }
-            else if((*it)->getType() == "and"){ //checks to see if type is AND connector
+            else if((*it)->getType() == "and"){
                 if((*it)->getBool() == true){
                     (*it)->execute();
                 }
             }
-            else if((*it)->getType() == "semi"){ //checks to see if type is SEMI conductor
+            else if((*it)->getType() == "semi"){
                 (*it)->execute();
             }
         }
