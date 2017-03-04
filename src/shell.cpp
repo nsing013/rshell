@@ -13,30 +13,33 @@
 using namespace std;
 
 void testCommand(string test, string path){
-    cout << "test " << test << " path " << path << endl;
-    char * path_c = new char [path.length() + 1];
-    struct stat s;
-    if(stat(path_c, &s) == 0){
-        if(test == "-f" || test == "-d"){
-            if(s.st_mode & S_IFDIR && test == "-d"){
-                cout << "(True)" << endl; 
-                cout << "It is a directory" << endl;
-            }
-            else if(s.st_mode & S_IFREG && test == "-f"){
-                cout << "(True)" << endl;
-                cout << "It is a file" << endl;
-            }
-            else{
-                cout << "(False)" << endl;
-            }
+    //cout << "test " << test << " path " << path << endl; //testing
+    
+    struct stat s;                                       //declare Stat S
+    stat(path.c_str(), &s);                              //make stat
+    if(test == "-f" || test == "-d"){
+        // bool dir = S_ISDIR(s.st_mode);                   //tests directory
+        // cout << "result of S_ISDIR is: " << dir << endl;
+        // bool fi = S_ISREG(s.st_mode);
+        // cout << "result of S_ISREG is: " << fi << endl;  //tests file
+        if(S_ISDIR(s.st_mode) && test == "-d"){
+            cout << "(True)" << endl; 
+            cout << "It is a directory" << endl;
         }
-        else if(test == "-e"){
-            if((s.st_mode & S_IFDIR) || (s.st_mode & S_IFREG)){
-                cout << "(True)" << endl;
-            }
-            else{
-                cout << "(False)" << endl;
-            }
+        else if(S_ISREG(s.st_mode) && test == "-f"){
+            cout << "(True)" << endl;
+            cout << "It is a file" << endl;
+        }
+        else{
+            cout << "(False)" << endl;
+        }
+    }
+    else if(test == "-e"){
+        if(S_ISDIR(s.st_mode) || S_ISREG(s.st_mode)){
+            cout << "(True)" << endl;
+        }
+        else{
+            cout << "(False)" << endl;
         }
     }
 }
@@ -99,6 +102,9 @@ void shell::run(){
             }
             else if(word.at(0) == '#'){ //CHEKCS TO SEE IF USER ENTERED COMMENT
                 break;
+            }
+            else if(word == "]"){
+                continue;
             }
             else if(word == "test" || word == "["){
                 //cout << "test for word" << word << endl; //TESTING
