@@ -1,5 +1,5 @@
 #!/bin/sh
-echo hello
-ls -l
-ls -a
+echo this is the; echo exit test;
+echo a; echo b; echo c && echo d 
+ls && ls -l
 exit

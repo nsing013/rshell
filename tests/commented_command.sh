@@ -1,8 +1,4 @@
 #!/bin/sh
-ls -a
-ls -l
-echo hello world
-ls
-touch wow
-#this is not relevant
+echo a && echo b #you can not see this
+ls -l && ls #hello world
 exit
