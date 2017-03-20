@@ -15,14 +15,21 @@ called "Exit" which is handles the Built In Command Exit */
 
 class command{
   public:
-    command(vector<string> cmd);
+    command(vector<string> cmd, string iFile, string oFile, bool appendFlag, bool pipeFlag);
     void parse();
     void execCmd();
     bool didCommand();
+    int didPipefd();
+    void doSetPipefd(int fd);
   private:
     vector<string> input;
-    bool failedExecute;
+    bool passedExecution;
     char** arguments;
+    string inputFile;
+    string outputFile;
+    bool append;
+    bool doPipe;
+    int fdInputPipe;
 };
 
 #endif
