@@ -5,8 +5,8 @@
 #include "command.h"
 using namespace std;
 
-/* this class is the Base Connector class. It has 4 children.
-"||" "&&" ";" "head". */
+/* this class is the Base Connector class. It has 8 children.
+"||" "&&" ";" "head" "<" ">"  ">>" "|" */
 
 class connector
 {
@@ -16,6 +16,8 @@ class connector
     void execute();
     virtual string getType() = 0;
     bool getBool();
+    int getPipefd();
+    void setPipefd(int fd);
   protected:
     command* child;
 };
@@ -25,7 +27,6 @@ class head : public connector
   public:
     head();
     string getType();
-    // bool getBool();
   private:
     string type;
 };
@@ -35,7 +36,6 @@ class opOr : public connector
   public:
     opOr();
     string getType();
-    // bool getBool();
   private:
     string type;
 };
@@ -45,7 +45,6 @@ class opAnd : public connector
   public:
     opAnd();
     string getType();
-    // bool getBool();
   private:
     string type;
 };
@@ -55,7 +54,42 @@ class opSemi : public connector
   public:
     opSemi();
     string getType();
-    // bool getBool();
+  private:
+    string type;
+};
+
+// class opInputRed : public connector
+// {
+//   public:
+//     opInputRed();
+//     string getType();
+//   private:
+//     string type;
+// };
+
+// class opOutputRed : public connector
+// {
+//   public:
+//     opOutputRed();
+//     string getType();
+//   private:
+//     string type;
+// };
+
+// class opAppendOutputRed : public connector
+// {
+//   public:
+//     opAppendOutputRed();
+//     string getType();
+//   private:
+//     string type;
+// };
+
+class opPipe : public connector
+{
+  public:
+    opPipe();
+    string getType();
   private:
     string type;
 };
